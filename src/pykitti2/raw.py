@@ -1,4 +1,5 @@
-"""Provides 'raw', which loads and parses raw KITTI data."""
+"""Provides 'raw', which loads and parses raw KITTI data.
+   Modified by ITS Lab, UT @ shan.wu@ut.ee"""
 
 import datetime as dt
 import glob

@@ -23,7 +23,7 @@ def arg_parser():
     parser.add_argument('--test', action='store_true', help='Start testing process.')
     parser.add_argument('--err', type=int, default=4, help='Error group to select.')
     parser.add_argument('--iter', action='store_true', help='Using iterative calibration during testing.')
-    parser.add_argument('--model', type=int, default=2, help='Select model variant to test.')
+    parser.add_argument('--model', type=int, default=1, help='Select model variant to test.')
     parser.add_argument('--win-scale', type=float, default=2.5, help='Window size scaling while testing.')
     return parser.parse_args()
 

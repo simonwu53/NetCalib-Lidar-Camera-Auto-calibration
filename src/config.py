@@ -7,16 +7,16 @@ import numpy as np
 SIGDICT = {2: 'SIGINT', 15: 'SIGTERM'}
 
 # Set global save path
-PROJECT_BASE = '/home/shanwu/Projects/autocalibration_project/'
+PROJECT_BASE = '/home/user/NetCalib-Lidar-Camera-Auto-calibration/'
 DATETIME = datetime.now().strftime("%H%M_%d%m%Y")
 SAVE_ROOT = join(PROJECT_BASE, 'results/', DATETIME)
 LOG_DIR = join(SAVE_ROOT, 'log/')
 SAVE_DIR = join(SAVE_ROOT, 'ckpt')
 
 # 1. Train Data
-KITTI_TRAIN_BASE = '/home/shanwu/Projects/dataset/KITTI/train/'
-KITTI_VAL_BASE = '/home/shanwu/Projects/dataset/KITTI/val/'
-KITTI_TEST_BASE = '/home/shanwu/Projects/dataset/KITTI/test/'
+KITTI_TRAIN_BASE = '/home/user/datasets/KITTI/train/'
+KITTI_VAL_BASE = '/home/user/datasets/KITTI/val/'
+KITTI_TEST_BASE = '/home/user/datasets/KITTI/test/'
 LIDAR_MEAN = 0.8119
 LIDAR_STD = 4.0786
 CAM_MEAN = 4.1367
