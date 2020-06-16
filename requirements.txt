@@ -1,0 +1,7 @@
+torch~=1.5.0+cu101
+numpy~=1.18.4
+Pillow~=7.1.2
+pandas~=1.0.3
+tqdm~=4.46.0
+torchvision~=0.6.0+cu101
+opencv-contrib-python~=4.2.0.34
