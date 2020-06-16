@@ -13,7 +13,7 @@ Finally, two sets of output layers are used for rotation errors and translation 
 
 ### Experiment results
 #### 1. Losses
-<img src="assets/train_loss.png" width="200" alt="train-loss"> <img src="assets/valid_loss.png" width="200" alt="valid-loss"> <img src="assets/test_loss2.png" width="200" alt="valid-loss">
+<img src="assets/train_loss.png" width="300" alt="train-loss"> <img src="assets/valid_loss.png" width="300" alt="valid-loss"> <img src="assets/test_loss2.png" width="300" alt="valid-loss">
 
 #### 2. Model inference error
 <img src="assets/error-rotation.png" width="400" alt="rotation-error"> <img src="assets/error-translation.png" width="400" alt="translation-error">
