@@ -11,6 +11,9 @@ Then, the output feature maps are concatenated and they are fed to the global re
 A SPP layer is used after the output from previous module to provide a fixed length feature vector.
 Finally, two sets of output layers are used for rotation errors and translation errors separately.
 
+### Motivation
+We are reaĺeasing our approach's source code for autocalibration camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
+
 ### Experiment results
 #### 1. Losses
 <img src="assets/train_loss.png" width="300" alt="train-loss"> <img src="assets/valid_loss.png" width="300" alt="valid-loss"> <img src="assets/test_loss2.png" width="300" alt="valid-loss">
