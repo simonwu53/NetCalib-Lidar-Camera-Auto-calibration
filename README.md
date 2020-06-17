@@ -54,7 +54,7 @@ You can test the trained model by the command below, where `--win-scale` changes
 python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calibration/results/test1/ckpt/ckpt.tar --win-scale 2.5
 ```
 ### Licence 
-NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. For a list of all source code dependencies, please see [here] (https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/requirements.txt).
+NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. For a list of all source code dependencies, please see [here](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/requirements.txt).
 
 For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Link]()
 
