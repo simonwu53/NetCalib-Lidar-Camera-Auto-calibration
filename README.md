@@ -12,7 +12,7 @@ A SPP layer is used after the output from previous module to provide a fixed len
 Finally, two sets of output layers are used for rotation errors and translation errors separately.
 
 ### Motivation
-We are reaĺeasing our approach's source code for autocalibrating camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
+We are releasing our approach's source code for autocalibrating camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
 
 ### Experiment results
 #### 1. Losses
@@ -34,6 +34,7 @@ The codes were tested on Ubuntu 19.10 & 20.04 with Python 3.7 & 3.8. Generally, 
 
 1. Clone the repo to your local drive. 
 2. Setup your own Python environment and install the `requirements.txt` by command `pip3 install -r requirements.txt`. 
+3. The installation of `pytorch` and `torchvision` may vary in the future, you can install manually via the [official website](https://pytorch.org/get-started/locally/).
 
 ### Train the model
 Modify the configurations in `src/config.py`. 
