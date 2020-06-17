@@ -56,10 +56,7 @@ For a closed-source version of NetCalib for commercial purposes, please contact 
 
 
 ### Contributors
-Shan Wu; 
-Amnir Hadachi; 
-Damien Vivet;  
-Yadu Prahbakar. 
+Shan Wu; Amnir Hadachi; Damien Vivet; Yadu Prahbakar.  
 
 ### Citation 
 If you use NetCalib in an academic work, please cite:
