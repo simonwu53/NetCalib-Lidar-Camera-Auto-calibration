@@ -12,7 +12,7 @@ A SPP layer is used after the output from previous module to provide a fixed len
 Finally, two sets of output layers are used for rotation errors and translation errors separately.
 
 ### Motivation
-We are reaĺeasing our approach's source code for autocalibration camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
+We are reaĺeasing our approach's source code for autocalibrating camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
 
 ### Experiment results
 #### 1. Losses
