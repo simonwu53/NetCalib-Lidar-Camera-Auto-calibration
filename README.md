@@ -56,9 +56,9 @@ For a closed-source version of NetCalib for commercial purposes, please contact 
 
 
 ### Contributors
-Shan Wu 
-Amnir Hadachi 
-Damien Vivet 
+Shan Wu; 
+Amnir Hadachi; 
+Damien Vivet;  
 Yadu Prahbakar
 
 ### Citation 
