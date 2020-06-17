@@ -31,6 +31,7 @@ We are releasing our approach's source code for autocalibrating camera and lidar
 
 ### Deployment
 The codes were tested on Ubuntu 19.10 & 20.04 with Python 3.7 & 3.8. Generally, a Ubuntu 18.04+ with Python3+ will be compatible as long as you can install those required libraries.
+For a list of all source code dependencies, please see [here](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/requirements.txt).
 
 1. Clone the repo to your local drive. 
 2. Setup your own Python environment and install the `requirements.txt` by command `pip3 install -r requirements.txt`. 
@@ -54,7 +55,7 @@ You can test the trained model by the command below, where `--win-scale` changes
 python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calibration/results/test1/ckpt/ckpt.tar --win-scale 2.5
 ```
 ### Licence 
-NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. For a list of all source code dependencies, please see [here](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/requirements.txt).
+NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. 
 
 For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Link]()
 
