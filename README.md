@@ -52,7 +52,7 @@ python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calib
 ### Licence 
 NetCalib is released under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. For a list of all ...... dependencies, please see .......
 
-For a closed-source version of NetCalib for commercial purposes, please contact the authors: its.
+For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Link]()
 
 
 ### Contributors
@@ -62,7 +62,7 @@ Shan Wu; Amnir Hadachi; Damien Vivet; Yadu Prahbakar.
 If you use NetCalib in an academic work, please cite:
 
 
-Preprint version of the paper is here.
+Preprint version of the paper is [here]().
 
 ### References
 
