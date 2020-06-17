@@ -1,6 +1,6 @@
 ## NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning
 
-This work is published as the paper ... 
+This work is published as a paper in icpr 2020.
 
 <img src="assets/Auto-Calibration-Figure.png" width="1600" alt="Train_Accuracy">
 
@@ -49,3 +49,23 @@ You can test the trained model by the command below, where `--win-scale` changes
 ```shell script
 python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calibration/results/test1/ckpt/ckpt.tar --win-scale 2.5
 ```
+### Licence 
+NetCalib is released under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. For a list of all ...... dependencies, please see .......
+
+For a closed-source version of NetCalib for commercial purposes, please contact the authors: its.
+
+
+### Contributors
+Shan Wu 
+Amnir Hadachi 
+Damien Vivet 
+Yadu Prahbakar
+
+### Citation 
+If you use NetCalib in an academic work, please cite:
+
+
+Preprint version of the paper is here.
+
+### References
+
