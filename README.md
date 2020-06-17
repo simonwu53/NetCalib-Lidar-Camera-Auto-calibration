@@ -67,5 +67,4 @@ If you use NetCalib in an academic work, please cite:
 
 Preprint version of the paper is [here]().
 
-### References
 
