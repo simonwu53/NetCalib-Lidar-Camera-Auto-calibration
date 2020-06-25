@@ -1,6 +1,6 @@
 ## NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning
 
-This work is published as a paper in icpr 2020.
+This work is submitted as a paper in icpr 2020.
 
 <img src="assets/Auto-Calibration-Figure.png" width="1600" alt="Train_Accuracy">
 
