@@ -65,7 +65,15 @@ Shan Wu; Amnir Hadachi; Damien Vivet; Yadu Prabhakar.
 
 ### Citation 
 If you use NetCalib in an academic work, please cite:
-
+```
+@inproceedings{Shan2020Road,
+  title={NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning},
+  author={Shan, Wu; Hadachi, Amnir; Vivet, Damien; Prabhakar, Yadu},
+  booktitle={Proceedings of the 25th International Conference on Pattern recognition 2020},
+  year={2021},
+  organization={IEEE}
+}
+```
 
 Preprint version of the paper is [here]().
 
