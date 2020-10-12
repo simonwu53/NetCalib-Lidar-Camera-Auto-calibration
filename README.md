@@ -70,7 +70,7 @@ If you use NetCalib in an academic work, please cite:
   title={NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning},
   author={Shan, Wu; Hadachi, Amnir; Vivet, Damien; Prabhakar, Yadu},
   booktitle={Proceedings of the 25th International Conference on Pattern recognition 2020},
-  year={2021},
+  year={2020},
   organization={IEEE}
 }
 ```
