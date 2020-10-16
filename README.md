@@ -1,4 +1,4 @@
-## NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning
+# NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning
 
 This work is submitted as a paper to icpr 2020.
 
@@ -11,17 +11,17 @@ Then, the output feature maps are concatenated and they are fed to the global re
 A SPP layer is used after the output from previous module to provide a fixed length feature vector.
 Finally, two sets of output layers are used for rotation errors and translation errors separately.
 
-### Motivation
+## Motivation
 We are releasing our approach's source code for autocalibrating camera and lidar sensors to share with the scientific community and industry with the aim of the collaboration with people around the world to push the boundaries in the field of autonomous driving and intelligent transportation systems. 
 
-### Experiment results
-#### 1. Losses
+## Experiment results
+### 1. Losses
 <img src="assets/train_loss.png" width="300" alt="train-loss"> <img src="assets/valid_loss.png" width="300" alt="valid-loss"> <img src="assets/test_loss2.png" width="300" alt="valid-loss">
 
-#### 2. Model inference error
+### 2. Model inference error
 <img src="assets/error-rotation.png" width="400" alt="rotation-error"> <img src="assets/error-translation.png" width="400" alt="translation-error">
 
-#### 3. Visualization
+### 3. Visualization
 | | Sample 1 | Sample 2 |
 | :---:  | :---: | :---: |
 | LiDAR with error | <img src="assets/test-1-lidar-err.png" width="700" alt="lidar-err-1"> | <img src="assets/test-193-lidar-err.png" width="700" alt="lidar-err-2">|
@@ -29,7 +29,7 @@ We are releasing our approach's source code for autocalibrating camera and lidar
 | LiDAR ground truth | <img src="assets/test-1-lidar-gt.png" width="700" alt="lidar-gt-1"> | <img src="assets/test-193-lidar-gt.png" width="700" alt="lidar-gt-2">
 | Stereo depth | <img src="assets/test-1-stereo.png" width="700" alt="lidar-stereo-1"> | <img src="assets/test-193-stereo.png" width="700" alt="lidar-stereo-2">
 
-### Deployment
+## Deployment
 The codes were tested on Ubuntu 19.10 & 20.04 with Python 3.7 & 3.8. Generally, a Ubuntu 18.04+ with Python3+ will be compatible as long as you can install those required libraries.
 For a list of all source code dependencies, please see [here](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/requirements.txt).
 
@@ -37,7 +37,7 @@ For a list of all source code dependencies, please see [here](https://github.com
 2. Setup your own Python environment and install the `requirements.txt` by command `pip3 install -r requirements.txt`. 
 3. The installation of `pytorch` and `torchvision` may vary in the future, you can install manually via the [official website](https://pytorch.org/get-started/locally/).
 
-### Train the model
+## Train the model
 Modify the configurations in `src/config.py`. 
 You can start training the model from the beginning using `--train` argument. 
 `--err` specifies the error range to use, which is defined in the configuration.
@@ -48,22 +48,22 @@ python main.py --train --err 3
 
 In order to continue training, you can add `--ckpt` argument to specify the pytorch checkpoint `tar` file.
 
-### Test the model
+## Test the model
 You can test the trained model by the command below, where `--win-scale` changes the opencv window size.
 
 ```shell script
 python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calibration/results/test1/ckpt/ckpt.tar --win-scale 2.5
 ```
-### Licence 
+## Licence 
 NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. 
 
-For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Link]()
+For a closed-source version of NetCalib for commercial purposes, please contact the authors: <Shan.Wu@ut.ee>, <Amnir.Hadachi@ut.ee>
 
 
-### Contributors
+## Contributors
 Shan Wu; Amnir Hadachi; Damien Vivet; Yadu Prabhakar.  
 
-### Citation 
+## Citation 
 If you use NetCalib in an academic work, please cite:
 ```
 @inproceedings{Shan2021NetCalib,
