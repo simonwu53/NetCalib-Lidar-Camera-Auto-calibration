@@ -57,7 +57,7 @@ python main.py --test --err 4 --ckpt /home/user/NetCalib-Lidar-Camera-Auto-calib
 ## Licence 
 NetCalib is released under a [GPLv3.0](https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration/blob/master/LICENSE) license. 
 
-For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Wu](mailto:Shan.Wu@ut.ee)and[Hadachi](mailto:hadachi@ut.ee)
+For a closed-source version of NetCalib for commercial purposes, please contact the authors: [Wu](mailto:Shan.Wu@ut.ee) and [Hadachi](mailto:hadachi@ut.ee)
 
 
 ## Contributors
