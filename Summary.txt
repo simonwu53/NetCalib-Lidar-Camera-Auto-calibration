@@ -1,0 +1,5 @@
+In this paper, we demonstrated a novel approach to calibrate the LiDAR and Stereo cameras using a deep neural network. 
+The neural network takes the depth map from the left camera (reference camera) and another depth map that is projected from LiDAR point clouds, and output the estimated error vector for rotation and translation. 
+The results shows we achieved -0.04°, 0.16°, -0.09° in roll, pitch, yaw rotational errors, and 1.20 cm, 2.77 cm, -1.10 cm in X, Y, Z axis translation errors.
+
+The details of the work can be found in GitHub: https://github.com/simonwu53/NetCalib-Lidar-Camera-Auto-calibration
