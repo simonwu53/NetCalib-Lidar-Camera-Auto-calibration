@@ -12,7 +12,7 @@ logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
 LOG = logging.getLogger('Net-Projection')
 
 
-MAT_T_BOTTOM = torch.tensor([[0, 0, 0, 1]], dtype=torch.float32, device=DEVICE, requires_grad=False)
+MAT_T_BOTTOM = torch.tensor([[0, 0, 0, 1]], dtype=torch.float32, device=DEVICE)
 
 
 def inv_transform(T):
@@ -51,26 +51,35 @@ def inv_transform_vectorized(T):
     return Tinv
 
 
-def phi_to_transformation_matrix(phi):
+def phi_to_transformation_matrix(phi, device=DEVICE, requires_grad=False):
     """
     Transform calibration vector to calibration matrix (Numpy version)
     \theta_{calib} = [r_x,r_y,r_z,t_x,t_y,t_z]^T -> \phi_{calib} 4*4 matrix
 
     :param phi: calibration PyTorch Tensor (length 6, shape (6,)), which is an output from calibration network
+    :param device: 'cuda' or 'cpu', specify where to put the new Tensor. Works with "requires_grad=False" only.
+    :param requires_grad: bool, if True, keep tracking the gradients of the input Tensor, will ignore "device" param.
 
     :return: transformation matrix from Lidar coordinates to camera's frame
     """
     # split rotation & translation values
     rot, trans = phi[:3], phi[3:]
     # get rotation matrix
-    rot_mat = angle_to_rotation_matrix(rot)
-    # create transformation matrix
-    T = torch.zeros(4, 4, dtype=torch.float32, device=DEVICE, requires_grad=False)
+    rot_mat = angle_to_rotation_matrix(rot, device=device, requires_grad=requires_grad)
 
-    T[:3, :3] = rot_mat
-    T[:3, 3] = trans
-    T[3, 3] = 1
-    return T
+    if not requires_grad:
+        # create transformation matrix
+        T = torch.zeros(4, 4, dtype=torch.float32, device=DEVICE, requires_grad=False)
+
+        T[:3, :3] = rot_mat
+        T[:3, 3] = trans
+        T[3, 3] = 1
+        return T
+    else:
+        device = phi.device
+        dtype = phi.dtype
+        bot = torch.tensor([[0, 0, 0, 1]], dtype=dtype, device=device)
+        return torch.cat([torch.cat([rot_mat, trans.unsqueeze(1)], dim=1), bot], dim=0)
 
 
 def phi_to_transformation_matrix_vectorized(phi):
@@ -97,23 +106,33 @@ def phi_to_transformation_matrix_vectorized(phi):
     return T
 
 
-def angle_to_rotation_matrix(rot):
+def angle_to_rotation_matrix(rot, device=DEVICE, requires_grad=False):
     """
     Transform vector of Euler angles to rotation matrix
     ref: http://danceswithcode.net/engineeringnotes/rotations_in_3d/rotations_in_3d_part1.html
 
     :param rot: euler angle PyTorch Tensor (length 3 shape (3,), roll-pitch-yaw or x-y-z)
+    :param device: 'cuda' or 'cpu', specify where to put the new Tensor. Works with "requires_grad=False" only.
+    :param requires_grad: bool, if True, keep tracking the gradients of the input Tensor, will ignore "device" param.
     :return: 3*3 rotation matrix
     """
     u, v, w = rot
     s_u, c_u = u.sin(), u.cos()
     s_v, c_v = v.sin(), v.cos()
     s_w, c_w = w.sin(), w.cos()
-    return torch.tensor([
-        [c_v*c_w, s_u*s_v*c_w-c_u*s_w, s_u*s_w+c_u*s_v*c_w],
-        [c_v*s_w, c_u*c_w+s_u*s_v*s_w, c_u*s_v*s_w-s_u*c_w],
-        [-s_v, s_u*c_v, c_u*c_v]
-    ], dtype=torch.float32, device=DEVICE, requires_grad=False)
+
+    if not requires_grad:
+        return torch.tensor([
+            [c_v*c_w, s_u*s_v*c_w-c_u*s_w, s_u*s_w+c_u*s_v*c_w],
+            [c_v*s_w, c_u*c_w+s_u*s_v*s_w, c_u*s_v*s_w-s_u*c_w],
+            [-s_v, s_u*c_v, c_u*c_v]
+        ], dtype=torch.float32, device=device, requires_grad=False)
+
+    else:
+        # keep tracking the gradients, devices, and dtype
+        return torch.stack([torch.stack([c_v*c_w, s_u*s_v*c_w-c_u*s_w, s_u*s_w+c_u*s_v*c_w]),
+                            torch.stack([c_v*s_w, c_u*c_w+s_u*s_v*s_w, c_u*s_v*s_w-s_u*c_w]),
+                            torch.stack([-s_v, s_u*c_v, c_u*c_v])])
 
 
 def angle_to_rotation_matrix_vectorized(rot):
@@ -148,7 +167,7 @@ def angle_to_rotation_matrix_vectorized(rot):
     return torch.cat([row1.unsqueeze(1), row2.unsqueeze(1), row3.unsqueeze(1)], 1)
 
 
-def proj_lidar(scan, T, P0, resolution, R0=None, crop=None):
+def proj_lidar(scan, T, P0, resolution, R0=None, crop=None, only_pts=False):
     """
     Project Lidar point cloud onto image plane by a given transformation matrix T
 
@@ -158,12 +177,13 @@ def proj_lidar(scan, T, P0, resolution, R0=None, crop=None):
     :param R0: Left Rectification matrix (3*3 rotation matrix), pytorch Tensor
     :param resolution: image origin resolution, shape (H,W).
     :param crop: Optional[Tuple[int]], crop size in tuple (H, W)
+    :param only_pts: bool, if True, return 2d index in camera's view, and corresponding depth values from Lidar
     :return: projected image shape Tensor
     """
     if crop is None:
         xmin, ymin = 0, 0
         xmax, ymax = resolution[1], resolution[0]
-        new_shape = resolution
+        new_shape = (resolution[0], resolution[1])
     else:
         ymin, ymax, xmin, xmax = calc_crop_bbox(resolution, crop)
         new_shape = (ymax-ymin, xmax-xmin)
@@ -179,40 +199,131 @@ def proj_lidar(scan, T, P0, resolution, R0=None, crop=None):
         pts3d_cam = R0.mm(T.mm(pts3d.t()))
 
     # Before projecting, keep only points with z>0
-    # (points that are in fronto of the camera).
+    # (points that are in front of the camera).
     idx = pts3d_cam[2, :] > 0
     pts2d_cam = P0.mm(pts3d_cam[:, idx])
 
     # get projected 2d & 3d points
     pts3d = pts3d[idx]
     pts2d = pts2d_cam / pts2d_cam[2, :]
-    pts2d = pts2d.t().round().type(torch.long)
-
-    # create depth map
-    depth = torch.zeros(new_shape, dtype=torch.float32, device=DEVICE, requires_grad=False)
 
     # keep points projected in the image plane
+    pts2d = pts2d.t().round().type(torch.long)
     mask = (xmin < pts2d[:, 0]) & (pts2d[:, 0] < xmax) & \
            (ymin < pts2d[:, 1]) & (pts2d[:, 1] < ymax)
     pts2d = pts2d[mask][:, :2]  # keep only coordinates
-    pts3d = pts3d[mask][:, 0]  # ke ep only x values of scan (depth)
+    pts3d = pts3d[mask][:, 0]  # keep only x values of scan (depth)
 
     if crop is not None:
         pts2d[:, 0] = pts2d[:, 0] - xmin  # shift coordinates for assigning values
         pts2d[:, 1] = pts2d[:, 1] - ymin
 
-    # assign values
-    depth[pts2d[:, 1], pts2d[:, 0]] = pts3d  # disparity: bs*fu/pts3d
+    if only_pts:
+        return pts2d, pts3d
 
+    # create depth map
+    return draw_depth_map(new_shape, pts2d, pts3d)  # disparity: bs*fu/pts3d
+
+
+def draw_depth_map(shape, idx, val):
+    """
+    create an empty image, put values into desired coordinates
+
+    :param shape: (H, W), image shape to be created
+    :param idx: shape (N, 2), dtype long, a series of coordinates, each of them is (h, w) index on the image
+    :param val: values to assign on the image
+    :return: the interpreted image
+    """
+    depth = torch.zeros(shape, dtype=torch.float32, device=DEVICE, requires_grad=False)
+    depth[idx[:, 1], idx[:, 0]] = val
     return depth
 
 
-def lidar_depth_maps_check(dataset, cam=0):
+def proj_lidar_new(pc, T, P0, resolution, R0=None, crop=None, min_dist=2.0,
+                   return_idx_depth=False, move_idx=True):
+    """
+    Project Lidar point cloud onto image plane by a given transformation matrix T
+
+    :param pc: point cloud scan in pytorch Tensor, shape [N_points, 4]
+    :param T: transformation matrix, pytorch Tensor, shape (4, 4)
+    :param P0: intrinsic cam P matrix (left), pytorch Tensor, used in standard projection
+    :param R0: Left Rectification matrix (3*3 rotation matrix), pytorch Tensor
+    :param resolution: image origin resolution, shape (H,W).
+    :param crop: Optional[Tuple[int]], crop size in tuple (H, W)
+    :param min_dist: minimum distance to exclude a Lidar point
+                     (to avoid get a point detected from cameras reflections), float
+    :param return_idx_depth: bool, if True, return 2d index in camera's view, and corresponding depth values from Lidar
+    :param move_idx: bool, if True, the calculated 2d coordinates will be shifted when cropping is used
+                           (to make the coordinates start from 0)
+    :return: projected image shape Tensor
+    """
+    # Reflectance > 0
+    pts3d = pc[pc[:, 3] > 0, :]
+    pts3d[:, 3] = 1
+
+    # transform from lidar's frame to reference camera's frame
+    if R0 is None:
+        pts3d_cam = T.mm(pts3d.t())  # in "pykitti" lib, R (rectification) is added in T (transformation)
+    else:
+        pts3d_cam = R0.mm(T.mm(pts3d.t()))
+
+    # extract the depth
+    # (x axis in Lidar's frame, but z axis in reference camera's frame after transformation)
+    depths = pts3d_cam[2, :]
+
+    # project camera intrinsic matrix and normalize on third dimension to get coordinates
+    pts2d_cam = P0.mm(pts3d_cam)
+    pts2d = pts2d_cam / pts2d_cam[2, :]
+
+    # calculate the camera view's new boundaries if cropping
+    if crop is None:
+        xmin, ymin = 0, 0
+        xmax, ymax = resolution[1], resolution[0]
+        new_shape = resolution
+    else:
+        ymin, ymax, xmin, xmax = calc_crop_bbox(resolution, crop)
+        new_shape = (ymax-ymin, xmax-xmin)
+
+    # sift points and only keep points in the camera view and keep 1 pixel margin
+    mask = torch.ones(depths.shape[0], dtype=torch.bool, device=DEVICE)
+    mask = torch.logical_and(mask, depths > min_dist)
+    mask = torch.logical_and(mask, pts2d[0, :] > xmin+1)
+    mask = torch.logical_and(mask, pts2d[0, :] < xmax-1)
+    mask = torch.logical_and(mask, pts2d[1, :] > ymin+1)
+    mask = torch.logical_and(mask, pts2d[1, :] < ymax-1)
+    pts2d = pts2d[:, mask]
+    depths = depths[mask]
+    # transpose the coordinates back to normal shape (that I prefer) and convert to int (for slicing)
+    pts2d = pts2d.t()
+    pts2d = pts2d.round().type(torch.long)
+
+    # return unshifted 2D coordinates
+    if return_idx_depth and not move_idx:
+        return pts2d, depths
+
+    # move (shift) the 2d coordinates to start from 0
+    # when you want to get the value from the image that has already been cropped,
+    # if you want to get the value from full image, no coordinates movement needed.
+    if crop is not None:
+        pts2d[:, 0] = pts2d[:, 0] - xmin  # shift coordinates for assigning values
+        pts2d[:, 1] = pts2d[:, 1] - ymin
+
+    # return shifted 2D coordinates
+    if return_idx_depth and move_idx:
+        return pts2d, depths
+
+    # draw depth map
+    return draw_depth_map(new_shape, pts2d, depths)
+
+
+def lidar_depth_maps_check(dataset, cam=0, crop=None, proj_func=proj_lidar, ):
     """
     Create lidar depth map tensor for all lidar scans
 
     :param dataset: pykitti.raw (or other data loader has the same api) object
+    :param proj_func: project function
     :param cam: camera number, default use grayscale left camera for projection
+    :param crop: Optional[Tuple[int]], crop size in tuple (H, W)
     :return: depth maps in one tensor, shape (frames, H, W)
     """
     # get output shape
@@ -242,6 +353,6 @@ def lidar_depth_maps_check(dataset, cam=0):
     # compute depth maps for lidar
     for i, scan in enumerate(dataset.velo):
         lidar = torch.from_numpy(scan).float().cuda()
-        maps[i] = proj_lidar(lidar, T, P0, out_shape)
+        maps[i] = proj_func(lidar, T, P0, out_shape, crop=crop)
 
     return maps

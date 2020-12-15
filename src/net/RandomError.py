@@ -1,4 +1,4 @@
-from typing import Dict, Sequence
+from typing import Mapping, Sequence
 from torch.distributions import uniform, normal
 import numpy as np
 import logging
@@ -11,7 +11,7 @@ LOG = logging.getLogger('ErrorGenerator')
 
 
 class ErrorGenerator:
-    def __init__(self, dist: str, config: Dict):
+    def __init__(self, dist: str, config: Mapping):
         """
         Generate a set of random rotation and translation error based on a specified distribution
 

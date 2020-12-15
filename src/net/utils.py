@@ -40,7 +40,9 @@ def calc_crop_bbox(orig_shape, crop_shape):
     """
     H, W = orig_shape
     h, w = crop_shape
-    assert h < H and w < W, 'Crop size must be smaller than the original size!'
+    assert h < H and w < W, \
+        'Crop size must be smaller than the original size! \n' \
+        'Original shape ({o[0]},{o[1]}), Crop shape ({c[0]},{c[1]})'.format(o=orig_shape, c=crop_shape)
     hmin = H // 2 - (h // 2)
     wmin = W // 2 - (w // 2)
     return hmin, hmin+h, wmin, wmin+w
@@ -74,3 +76,62 @@ def center_crop(arr, crop_size):
         return arr[:, hmin:hmax, wmin:wmax]
     else:
         return arr[:, :, hmin:hmax, wmin:wmax]
+
+
+def calib_np_to_phi(M, no_exception=False):
+    """
+    Transform calibration matrix to calibration vector (Numpy version)
+    M_{calib} = | R  T |   4*4 matrix
+                | 0  1 |
+
+    :param M: 4*4 calibration matrix
+    :param no_exception: bool, do not raise error there contains a wrong rotation matrix
+
+    :return: calibration vector [r_x,r_y,r_z,t_x,t_y,t_z]
+    """
+    if M.shape[0] != 4 or M.shape[1] != 4:
+        raise ValueError("A calibration (transformation) matrix must be a matrix of shape (4, 4)!")
+
+    translation = np.transpose(M[:3, 3])
+    orientation = rotation_matrix_to_angle(M[:3, :3], no_exception=no_exception)
+    calib_vec = np.zeros(6, np.float32)
+    calib_vec[:3] = orientation
+    calib_vec[3:] = translation
+    return calib_vec
+
+
+def rotation_matrix_to_angle(R, no_exception=False):
+    """
+    Convert a 3*3 rotation matrix to roll, pitch, yaw
+    :param R: 3*3 rotation matrix
+    :param no_exception: bool, do not raise error when a wrong matrix comes
+    :return: roll, pitch, yaw in radians
+    """
+    if not isRotationMatrix_np(R):
+        if not no_exception:
+            raise ValueError('This is not a rotation matrix! Hence can not convert to row, pitch, yaw!')
+        else:
+            # LOG.warning('This is not a rotation matrix! Hence can not convert to row, pitch, yaw!')
+            return 0, 0, 0
+
+    pitch = -np.arcsin(R[2, 0])
+
+    if R[2,0] == 1:
+        yaw = 0
+        roll = np.arctan2(-R[0,1], -R[0,2])
+    elif R[2,0] == -1:
+        yaw = 0
+        roll = np.arctan2(R[0,1], R[0,2])
+    else:
+        yaw = np.arctan2(R[1,0], R[0,0])
+        roll = np.arctan2(R[2,1], R[2,2])
+
+    return roll, pitch, yaw
+
+
+def isRotationMatrix_np(R):
+    Rt = np.transpose(R)
+    shouldBeIdentity = np.matmul(Rt, R)
+    I = np.identity(3, dtype=R.dtype)
+    n = np.linalg.norm(I - shouldBeIdentity)
+    return n < 1e-6

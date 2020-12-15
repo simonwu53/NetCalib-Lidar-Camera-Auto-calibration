@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Mapping
 import torch
 from torch.utils.data import IterableDataset, Dataset, DataLoader
 import os
@@ -15,7 +15,7 @@ logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
 LOG = logging.getLogger('Net-DataLoader')
 
 
-def get_dataloader(mode: str, err_dist: str, err_config: Dict):
+def get_dataloader(mode: str, err_dist: str, err_config: Mapping):
     """
     create dataloader from a pytorch dataset for training.
 
@@ -86,7 +86,7 @@ def read_depth(img, sparse_val=0):
 
 
 class TrainDataSet(Dataset):
-    def __init__(self, mode: str, err_dist: str, err_config: Dict):
+    def __init__(self, mode: str, err_dist: str, err_config: Mapping):
         """
         Train Dataset used by the DataLoader during the training
 
@@ -186,14 +186,17 @@ class TrainDataSet(Dataset):
 
 
 class TestDataSet(TrainDataSet):
-    def __init__(self, mode: str, err_dist: str, err_config: Dict):
+    def __init__(self, mode: str, err_dist: str, err_config: Mapping, crop=True):
         super().__init__(mode, err_dist, err_config)
+        self.crop = crop
+        self.current_pointer = 0  # current selected index (not global, for selected loader only)
+        self.current_loader = None  # current selected loader
         return
 
     def __getitem__(self, idx):
         depth, lidar, T, P0, rot, trans, shape, cam2 = None, None, None, None, None, None, None, None
         # lidar point cloud container
-        lidar_np = np.zeros((self.max_lidar_quantity, 4), dtype=np.float32)
+        lidar = np.zeros((self.max_lidar_quantity, 4), dtype=np.float32)
 
         # find idx in which data loader
         for k in self.loader:
@@ -202,21 +205,34 @@ class TestDataSet(TrainDataSet):
                 loader, T, P0 = self.loader[k]
                 # get real idx
                 idx = idx - k.start
+                # store pointer
+                self.current_pointer = idx
+                self.current_loader = loader
 
                 # get color cam
-                cam2 = center_crop(np.array(loader.get_cam2(idx + 5), dtype=np.uint8).transpose(2, 0, 1), CROP)
+                if self.crop:
+                    cam2 = center_crop(np.array(loader.get_cam2(idx + 5), dtype=np.uint8).transpose(2, 0, 1), CROP)
+                else:
+                    cam2 = np.array(loader.get_cam2(idx + 5), dtype=np.uint8).transpose(2, 0, 1)
 
                 # get depth map
                 raw_depth = read_depth(loader.get_cam2d(idx), self.sparse_val)  # (H,W)
                 shape = np.array(raw_depth.shape)  # (H, W)
-                depth = center_crop(raw_depth, CROP)
+                if self.crop:
+                    depth = center_crop(raw_depth, CROP)
+                else:
+                    depth = raw_depth
 
                 # get lidar point cloud
                 pc = loader.get_velo(idx + 5)
-                lidar_np[:pc.shape[0]] = pc
-                lidar = torch.from_numpy(lidar_np).float()
-                T = torch.from_numpy(T).float()
-                P0 = torch.from_numpy(P0).float()
+                lidar[:pc.shape[0]] = pc
+
+                # PATCH 11.11.2020: remove torch conversion for better compatibility
+                #                   PyTorch will do this after loaded data automatically
+                # lidar = torch.from_numpy(lidar).float()
+                # T = torch.from_numpy(T).float()
+                # P0 = torch.from_numpy(P0).float()
+                # END OF PATCH
 
                 # generate randomized error
                 rot, trans = self.errgen.gen_err()
