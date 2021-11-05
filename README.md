@@ -1,3 +1,5 @@
+# A new updated version is published in a separate [repo](https://github.com/simonwu53/NetCalib2-Sensors-Auto-Calibration)
+
 # NetCalib: A Novel Approach for LiDAR-Camera Auto-calibration Based on Deep Learning
 
 This work is accepted for publication in ICPR 2020.
